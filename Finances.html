@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finances & Budget | UniThrive+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    /* ── OVERVIEW CARDS ── */
+    .budget-dash { padding: 48px 6vw 80px; background: var(--black); }
+    .overview-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+    .ov-card {
+      background: var(--black-2);
+      border: 1px solid var(--border-dark);
+      border-radius: 2px;
+      padding: 26px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .ov-card:hover { border-color: rgba(201,168,76,0.3); transform: translateY(-2px); }
+    .ov-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .ov-card.income::before { background: var(--gold); }
+    .ov-card.expenses::before { background: #888; }
+    .ov-card.savings::before { background: var(--gold-light); }
+    .ov-card.balance::before { background: rgba(255,255,255,0.4); }
+    .ov-label {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 12px;
+      display: block;
+    }
+    .ov-value {
+      font-family: var(--font-display);
+      font-size: 1.7rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .ov-card.income .ov-value { color: var(--gold); }
+    .ov-card.expenses .ov-value { color: rgba(255,255,255,0.75); }
+    .ov-card.savings .ov-value { color: var(--gold-light); }
+    .ov-card.balance .ov-value { color: var(--white); }
+    .ov-change {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.35);
+    }
+    .ov-change .up { color: var(--gold); }
+    .ov-change .dn { color: rgba(255,255,255,0.5); }
+
+    /* ── DASH LAYOUT ── */
+    .dash-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      align-items: start;
+    }
+    .dash-panel {
+      background: var(--black-2);
+      border: 1px solid var(--border-dark);
+      border-radius: 2px;
+      padding: 28px;
+    }
+    .panel-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-action {
+      background: none;
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      padding: 6px 14px;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .panel-action:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* Bar Chart */
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 160px;
+      margin-bottom: 16px;
+      padding-bottom: 4px;
+    }
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .bar-wrap {
+      width: 100%;
+      display: flex;
+      gap: 2px;
+      align-items: flex-end;
+      flex: 1;
+    }
+    .bar {
+      flex: 1;
+      border-radius: 2px 2px 0 0;
+      min-height: 4px;
+      transition: height 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .bar.inc { background: var(--gold); opacity: 0.85; }
+    .bar.exp { background: rgba(255,255,255,0.2); }
+    .bar-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.3);
+    }
+    .chart-legend {
+      display: flex;
+      gap: 18px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.5);
+    }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    /* Transactions */
+    .transactions-list { display: flex; flex-direction: column; }
+    .transaction {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      border-radius: 3px;
+      transition: background 0.15s;
+    }
+    .transaction:last-child { border-bottom: none; }
+    .transaction:hover { background: rgba(255,255,255,0.02); }
+    .txn-icon {
+      width: 38px; height: 38px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .txn-info { flex: 1; min-width: 0; }
+    .txn-name {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .txn-date {
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.3);
+    }
+    .txn-cat {
+      padding: 3px 8px;
+      border-radius: 2px;
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.06em;
+    }
+    .txn-amount {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .txn-amount.credit { color: var(--gold); }
+    .txn-amount.debit { color: rgba(255,255,255,0.6); }
+
+    /* Add Transaction Form */
+    .add-form { display: flex; flex-direction: column; gap: 14px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+    .form-input, .form-select {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      padding: 11px 14px;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      color: var(--white);
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    .form-input:focus, .form-select:focus { border-color: var(--gold); }
+    .form-input::placeholder { color: rgba(255,255,255,0.2); }
+    .form-select option { background: var(--black-2); }
+    .type-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .type-btn {
+      padding: 11px;
+      border: none;
+      background: none;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: rgba(255,255,255,0.4);
+      transition: all 0.2s;
+    }
+    .type-btn.active.income { background: rgba(201,168,76,0.18); color: var(--gold); }
+    .type-btn.active.expense { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
+    .add-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--gold);
+      color: var(--black);
+      border: none;
+      border-radius: 3px;
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      letter-spacing: 0.04em;
+    }
+    .add-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    /* Donut */
+    .donut-wrap {
+      position: relative;
+      width: 160px; height: 160px;
+      margin: 0 auto 24px;
+    }
+    .donut-svg { width: 160px; height: 160px; }
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .donut-pct {
+      font-family: var(--font-display);
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .donut-label {
+      font-family: var(--font-body);
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.4);
+    }
+    .spending-cats { display: flex; flex-direction: column; gap: 10px; }
+    .spending-cat { display: flex; align-items: center; gap: 10px; }
+    .cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .cat-name {
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.65);
+      flex: 1;
+    }
+    .cat-bar-bg {
+      flex: 2;
+      height: 4px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .cat-bar-fill { height: 100%; border-radius: 10px; transition: width 1.2s ease; }
+    .cat-pct {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.35);
+      width: 32px;
+      text-align: right;
+    }
+
+    /* ── SAVINGS GOALS ── */
+    .goals-section { padding: 0 6vw 80px; background: var(--black); }
+    .goals-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+    .goals-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .goal-card {
+      background: var(--black-2);
+      border: 1px solid var(--border-dark);
+      border-radius: 2px;
+      padding: 26px;
+      transition: all 0.3s;
+    }
+    .goal-card:hover {
+      border-color: rgba(201,168,76,0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+    }
+    .goal-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .goal-icon {
+      width: 44px; height: 44px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      background: rgba(201,168,76,0.1);
+    }
+    .goal-pct-badge {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--gold);
+      background: rgba(201,168,76,0.12);
+      padding: 4px 10px;
+      border-radius: 2px;
+    }
+    .goal-name {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+    .goal-amounts {
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 14px;
+    }
+    .goal-bar-bg {
+      height: 6px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .goal-bar-fill {
+      height: 100%;
+      border-radius: 10px;
+      background: var(--gold);
+      transition: width 1.5s ease;
+    }
+    .add-goal-btn {
+      margin-top: 24px;
+      padding: 12px 28px;
+      background: none;
+      border: 1px solid var(--gold);
+      border-radius: 3px;
+      color: var(--gold);
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      letter-spacing: 0.04em;
+    }
+    .add-goal-btn:hover { background: var(--gold); color: var(--black); }
+
+    /* ── TIPS ── */
+    .tips-section { padding: 80px 6vw; background: var(--black-2); border-top: 1px solid var(--border-dark); }
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 40px;
+    }
+    .tip-card {
+      display: flex;
+      gap: 20px;
+      background: var(--black-3);
+      border: 1px solid var(--border-dark);
+      border-radius: 2px;
+      padding: 26px;
+      transition: all 0.3s;
+    }
+    .tip-card:hover { border-color: rgba(201,168,76,0.2); }
+    .tip-num {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: rgba(201,168,76,0.15);
+      line-height: 1;
+      flex-shrink: 0;
+      width: 44px;
+    }
+    .tip-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+    .tip-text {
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.65;
+      font-weight: 300;
+    }
+
+    @media (max-width: 1024px) {
+      .overview-cards { grid-template-columns: repeat(2, 1fr); }
+      .dash-layout { grid-template-columns: 1fr; }
+      .goals-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .overview-cards { grid-template-columns: 1fr 1fr; }
+      .goals-grid, .tips-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><span class="logo-icon">◆</span><span>Campus<strong>Budget+</strong></span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="explore.html">Explore</a></li>
+      <li><a href="finances.html" class="active">Finances</a></li>
+      <li><a href="marketplace.html">Marketplace</a></li>
+      <li><a href="community.html">Community</a></li>
+    </ul>
+    <div class="nav-actions"><a href="finances.html" class="nav-btn">Get Started →</a></div>
+    <button class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Home</a>
+  <a href="explore.html">Explore</a>
+  <a href="finances.html" class="active">Finances</a>
+  <a href="marketplace.html">Marketplace</a>
+  <a href="community.html">Community</a>
+</div>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <span class="section-tag">// Finances & Budgeting</span>
+    <h1>Track Every<br><em>Shilling</em></h1>
+    <p>Your personal finance dashboard. Set budgets, log expenses, track savings goals, and get smarter with your money every month.</p>
+  </div>
+</div>
+
+<section class="budget-dash">
+  <!-- Overview -->
+  <div class="overview-cards">
+    <div class="ov-card income reveal">
+      <span class="ov-label">Monthly Income</span>
+      <div class="ov-value">UGX 620,000</div>
+      <span class="ov-change"><span class="up">↑ 8%</span> vs last month</span>
+    </div>
+    <div class="ov-card expenses reveal reveal-delay-1">
+      <span class="ov-label">Total Expenses</span>
+      <div class="ov-value">UGX 387,000</div>
+      <span class="ov-change"><span class="dn">↑ 5%</span> vs last month</span>
+    </div>
+    <div class="ov-card savings reveal reveal-delay-2">
+      <span class="ov-label">Savings This Month</span>
+      <div class="ov-value">UGX 233,000</div>
+      <span class="ov-change"><span class="up">↑ 12%</span> vs last month</span>
+    </div>
+    <div class="ov-card balance reveal reveal-delay-3">
+      <span class="ov-label">Available Balance</span>
+      <div class="ov-value">UGX 233,000</div>
+      <span class="ov-change">On track ✓</span>
+    </div>
+  </div>
+
+  <div class="dash-layout">
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <!-- Chart -->
+      <div class="dash-panel reveal">
+        <div class="panel-title">
+          Income vs Expenses
+          <select style="background:rgba(255,255,255,0.05);border:1px solid var(--border-dark);border-radius:3px;padding:5px 12px;color:rgba(255,255,255,0.5);font-family:var(--font-body);font-size:0.78rem;outline:none;">
+            <option>Last 6 Months</option>
+            <option>Last 3 Months</option>
+            <option>This Year</option>
+          </select>
+        </div>
+        <div class="bar-chart" id="barChart"></div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>Income</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,0.3)"></div>Expenses</div>
+        </div>
+      </div>
+      <!-- Transactions -->
+      <div class="dash-panel reveal">
+        <div class="panel-title">
+          Recent Transactions
+          <button class="panel-action">View All</button>
+        </div>
+        <div class="transactions-list" id="txnList"></div>
+      </div>
+    </div>
+
+    <!-- Right col -->
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <!-- Add -->
+      <div class="dash-panel reveal">
+        <div class="panel-title">Add Transaction</div>
+        <div class="add-form">
+          <div class="type-toggle">
+            <button class="type-btn active income" id="incomeBtn" onclick="setType('income')">+ Income</button>
+            <button class="type-btn expense" id="expenseBtn" onclick="setType('expense')">− Expense</button>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input class="form-input" type="text" placeholder="e.g. Lunch at cafeteria" id="txnDesc" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Amount (UGX)</label>
+              <input class="form-input" type="number" placeholder="0" id="txnAmt" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select class="form-select" id="txnCat">
+                <option value="">Select...</option>
+                <option>🍽️ Food</option>
+                <option>🏠 Housing</option>
+                <option>🚌 Transport</option>
+                <option>📚 Education</option>
+                <option>💊 Health</option>
+                <option>👗 Clothing</option>
+                <option>📱 Data/Airtime</option>
+                <option>🎓 Bursary</option>
+                <option>💼 Part-time</option>
+                <option>🎁 Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input class="form-input" type="date" id="txnDate" />
+          </div>
+          <button class="add-btn" onclick="addTransaction()">+ Add Transaction</button>
+        </div>
+      </div>
+      <!-- Donut -->
+      <div class="dash-panel reveal">
+        <div class="panel-title">Spending Breakdown</div>
+        <div class="donut-wrap">
+          <svg class="donut-svg" viewBox="0 0 160 160" id="donutSvg"></svg>
+          <div class="donut-center">
+            <span class="donut-pct">62%</span>
+            <span class="donut-label">Used</span>
+          </div>
+        </div>
+        <div class="spending-cats" id="spendingCats"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SAVINGS GOALS -->
+<section class="goals-section">
+  <div class="goals-header reveal">
+    <div>
+      <span class="section-tag">// Savings Goals</span>
+      <h2 class="section-title">Your <em>Savings</em> Goals</h2>
+    </div>
+  </div>
+  <div class="goals-grid">
+    <div class="goal-card reveal">
+      <div class="goal-header-row">
+        <div class="goal-icon">💻</div>
+        <span class="goal-pct-badge">72%</span>
+      </div>
+      <div class="goal-name">New Laptop Fund</div>
+      <div class="goal-amounts">UGX 576,000 saved of UGX 800,000</div>
+      <div class="goal-bar-bg"><div class="goal-bar-fill" style="width:72%;"></div></div>
+    </div>
+    <div class="goal-card reveal reveal-delay-1">
+      <div class="goal-header-row">
+        <div class="goal-icon">✈️</div>
+        <span class="goal-pct-badge">45%</span>
+      </div>
+      <div class="goal-name">Holiday Trip</div>
+      <div class="goal-amounts">UGX 180,000 saved of UGX 400,000</div>
+      <div class="goal-bar-bg"><div class="goal-bar-fill" style="width:45%;"></div></div>
+    </div>
+    <div class="goal-card reveal reveal-delay-2">
+      <div class="goal-header-row">
+        <div class="goal-icon">📚</div>
+        <span class="goal-pct-badge">88%</span>
+      </div>
+      <div class="goal-name">Next Semester Books</div>
+      <div class="goal-amounts">UGX 88,000 saved of UGX 100,000</div>
+      <div class="goal-bar-bg"><div class="goal-bar-fill" style="width:88%;"></div></div>
+    </div>
+  </div>
+  <div style="margin-top:24px;">
+    <button class="add-goal-btn">+ Add New Goal</button>
+  </div>
+</section>
+
+<!-- TIPS -->
+<section class="tips-section">
+  <div class="reveal" style="text-align:center;">
+    <span class="section-tag">// Smart Money Tips</span>
+    <h2 class="section-title">Student <em>Finance</em> Tips</h2>
+  </div>
+  <div class="tips-grid">
+    <div class="tip-card reveal">
+      <div class="tip-num">01</div>
+      <div>
+        <div class="tip-title">The 50/30/20 Rule for Students</div>
+        <p class="tip-text">Allocate 50% to needs (food, housing, transport), 30% to wants (social, entertainment), and 20% to savings. Adjust for your bursary size.</p>
+      </div>
+    </div>
+    <div class="tip-card reveal reveal-delay-1">
+      <div class="tip-num">02</div>
+      <div>
+        <div class="tip-title">Cook More, Spend Less</div>
+        <p class="tip-text">Preparing even 3 meals a week instead of buying can save UGX 30,000–60,000 monthly. Organize group cooking with housemates.</p>
+      </div>
+    </div>
+    <div class="tip-card reveal">
+      <div class="tip-num">03</div>
+      <div>
+        <div class="tip-title">Use the Marketplace First</div>
+        <p class="tip-text">Before buying anything new, check the student marketplace. Textbooks, calculators, and equipment often sell for 50–70% less.</p>
+      </div>
+    </div>
+    <div class="tip-card reveal reveal-delay-1">
+      <div class="tip-num">04</div>
+      <div>
+        <div class="tip-title">Track Every Transaction</div>
+        <p class="tip-text">Even UGX 500 entries matter. Students who track daily often save 20% more by becoming aware of small habitual spending.</p>
+      </div>
+    </div>
+    <div class="tip-card reveal">
+      <div class="tip-num">05</div>
+      <div>
+        <div class="tip-title">Share Rides & Data</div>
+        <p class="tip-text">Splitting transport with 3 others saves UGX 12,000+ monthly. Group data bundle purchases are often 30% cheaper per person.</p>
+      </div>
+    </div>
+    <div class="tip-card reveal reveal-delay-1">
+      <div class="tip-num">06</div>
+      <div>
+        <div class="tip-title">Set Micro-Goals</div>
+        <p class="tip-text">Instead of "save money", set specific targets: "Save UGX 50,000 by end of month." Specific goals are 3× more likely to be achieved.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">◆ Campus<strong>Budget+</strong></div>
+      <p class="footer-tagline">Smart affordable living for every university student.</p>
+      <p class="footer-copy">© 2025 CampusBudget+ · Group Two, BIT Year 1 · MUST</p>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <a href="explore.html">Explore Listings</a>
+        <a href="finances.html">Budget Tracker</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="community.html">Community</a>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <a href="explore.html#resources">Study Materials</a>
+        <a href="explore.html#deals">Deals Board</a>
+        <a href="community.html#forum">Forums</a>
+      </div>
+      <div class="footer-col">
+        <h4>About</h4>
+        <a href="#">Project Proposal</a>
+        <a href="#">Team</a>
+        <a href="#">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="shared.js"></script>
+<script>
+  let currentType = 'income';
+  function setType(type) {
+    currentType = type;
+    document.getElementById('incomeBtn').classList.toggle('active', type==='income');
+    document.getElementById('incomeBtn').classList.toggle('income', type==='income');
+    document.getElementById('expenseBtn').classList.toggle('active', type==='expense');
+    document.getElementById('expenseBtn').classList.toggle('expense', type==='expense');
+  }
+
+  let transactions = [
+    { id:1, desc:'Monthly Bursary', cat:'🎓 Bursary', amount:350000, type:'income', date:'2025-05-01' },
+    { id:2, desc:'Part-time Tutoring', cat:'💼 Part-time', amount:120000, type:'income', date:'2025-05-03' },
+    { id:3, desc:'Cafeteria Lunch (x5)', cat:'🍽️ Food', amount:12500, type:'expense', date:'2025-05-04' },
+    { id:4, desc:'Hostel Rent', cat:'🏠 Housing', amount:120000, type:'expense', date:'2025-05-05' },
+    { id:5, desc:'Airtime & Data Bundle', cat:'📱 Data/Airtime', amount:15000, type:'expense', date:'2025-05-06' },
+    { id:6, desc:'Freelance Work', cat:'💼 Part-time', amount:150000, type:'income', date:'2025-05-07' },
+    { id:7, desc:'Transport — week', cat:'🚌 Transport', amount:14000, type:'expense', date:'2025-05-08' },
+    { id:8, desc:'Second-hand Textbook', cat:'📚 Education', amount:25000, type:'expense', date:'2025-05-08' },
+  ];
+
+  const catColors = {
+    '🍽️ Food':'#C9A84C','🏠 Housing':'#aaa','🚌 Transport':'#888','📚 Education':'#E8C97A',
+    '💊 Health':'#ccc','👗 Clothing':'#ddd','📱 Data/Airtime':'#999','🎓 Bursary':'#C9A84C',
+    '💼 Part-time':'#E8C97A','🎁 Other':'#666',
+  };
+
+  function renderTransactions() {
+    const list = document.getElementById('txnList');
+    const recent = [...transactions].reverse().slice(0,7);
+    list.innerHTML = recent.map(t => `
+      <div class="transaction">
+        <div class="txn-icon" style="background:rgba(201,168,76,0.08)">${t.cat.split(' ')[0]}</div>
+        <div class="txn-info">
+          <div class="txn-name">${t.desc}</div>
+          <div class="txn-date">${new Date(t.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
+        </div>
+        <span class="txn-cat" style="background:rgba(201,168,76,0.1);color:var(--gold)">${t.cat.split(' ').slice(1).join(' ')}</span>
+        <span class="txn-amount ${t.type==='income'?'credit':'debit'}">${t.type==='income'?'+':'−'} ${Number(t.amount).toLocaleString()}</span>
+      </div>
+    `).join('');
+  }
+
+  function addTransaction() {
+    const desc = document.getElementById('txnDesc').value.trim();
+    const amt = parseFloat(document.getElementById('txnAmt').value);
+    const cat = document.getElementById('txnCat').value;
+    const date = document.getElementById('txnDate').value || new Date().toISOString().split('T')[0];
+    if (!desc||!amt||!cat) { alert('Please fill in description, amount, and category.'); return; }
+    transactions.push({id:Date.now(),desc,cat,amount:amt,type:currentType,date});
+    document.getElementById('txnDesc').value='';
+    document.getElementById('txnAmt').value='';
+    renderTransactions();
+    renderDonut();
+  }
+
+  const chartData=[
+    {month:'Dec',inc:480,exp:370},{month:'Jan',inc:520,exp:410},
+    {month:'Feb',inc:490,exp:380},{month:'Mar',inc:560,exp:420},
+    {month:'Apr',inc:580,exp:395},{month:'May',inc:620,exp:387},
+  ];
+  function renderBarChart() {
+    const chart = document.getElementById('barChart');
+    const maxVal = Math.max(...chartData.map(d=>Math.max(d.inc,d.exp)));
+    chart.innerHTML = chartData.map(d=>`
+      <div class="bar-col">
+        <div class="bar-wrap">
+          <div class="bar inc" style="height:${(d.inc/maxVal)*100}%"></div>
+          <div class="bar exp" style="height:${(d.exp/maxVal)*100}%"></div>
+        </div>
+        <span class="bar-label">${d.month}</span>
+      </div>
+    `).join('');
+  }
+
+  const spendingData=[
+    {name:'Housing',pct:31,color:'#aaaaaa'},
+    {name:'Food',pct:23,color:'#C9A84C'},
+    {name:'Education',pct:18,color:'#E8C97A'},
+    {name:'Transport',pct:14,color:'#888888'},
+    {name:'Data',pct:8,color:'#cccccc'},
+    {name:'Other',pct:6,color:'#555555'},
+  ];
+  function renderDonut() {
+    const svg = document.getElementById('donutSvg');
+    const r=60,cx=80,cy=80;
+    const circ=2*Math.PI*r;
+    let offset=-Math.PI/2;
+    let paths='';
+    spendingData.forEach(seg=>{
+      const frac=seg.pct/100;
+      const x1=cx+r*Math.cos(offset),y1=cy+r*Math.sin(offset);
+      offset+=frac*2*Math.PI;
+      const x2=cx+r*Math.cos(offset),y2=cy+r*Math.sin(offset);
+      const large=frac>0.5?1:0;
+      paths+=`<path d="M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z" fill="${seg.color}" opacity="0.9"/>`;
+    });
+    paths+=`<circle cx="${cx}" cy="${cy}" r="42" fill="#111"/>`;
+    svg.innerHTML=paths;
+    document.getElementById('spendingCats').innerHTML=spendingData.map(s=>`
+      <div class="spending-cat">
+        <div class="cat-dot" style="background:${s.color}"></div>
+        <span class="cat-name">${s.name}</span>
+        <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${s.pct}%;background:${s.color}"></div></div>
+        <span class="cat-pct">${s.pct}%</span>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('txnDate').value=new Date().toISOString().split('T')[0];
+  renderBarChart();
+  renderTransactions();
+  renderDonut();
+</script>
+</body>
+</html>

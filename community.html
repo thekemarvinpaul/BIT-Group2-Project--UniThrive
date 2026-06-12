@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Community | UniThrive+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    /* ── COMMUNITY LAYOUT ── */
+    .community-main {
+      padding: 48px 5vw 88px;
+      background: var(--black);
+    }
+    .community-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* ── POST COMPOSER ── */
+    .composer {
+      background: var(--black-2);
+      border: 1px solid var(--bd-dark);
+      border-radius: var(--radius);
+      padding: 22px;
+      margin-bottom: 24px;
+    }
+    .composer-top {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .composer-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--black);
+      flex-shrink: 0;
+    }
+    .composer-input {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--bd-dark);
+      border-radius: var(--radius);
+      padding: 11px 14px;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      color: var(--white);
+      outline: none;
+      resize: none;
+      min-height: 72px;
+      transition: border-color 0.2s;
+      line-height: 1.6;
+    }
+    .composer-input::placeholder { color: rgba(255,255,255,0.22); }
+    .composer-input:focus { border-color: var(--gold); }
+    .composer-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: space-between;
+    }
+    .composer-tags { display: flex; gap: 8px; }
+    .composer-tag {
+      padding: 6px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--bd-dark);
+      border-radius: 40px;
+      font-family: var(--font-body);
+      font-size: 0.76rem;
+      color: rgba(255,255,255,0.45);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .composer-tag:hover, .composer-tag.active { background: rgba(200,168,75,0.1); border-color: var(--gold); color: var(--gold); }
+    .post-btn {
+      padding: 9px 22px;
+      background: var(--gold);
+      color: var(--black);
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--font-body);
+      font-size: 0.83rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+      letter-spacing: 0.04em;
+    }
+    .post-btn:hover { background: var(--gold-light); }
+
+    /* ── FORUM TABS ── */
+    .forum-tabs {
+      display: flex;
+      gap: 2px;
+      border-bottom: 1px solid var(--bd-dark);
+      margin-bottom: 24px;
+    }
+    .forum-tab {
+      padding: 12px 18px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.42);
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: -1px;
+      white-space: nowrap;
+    }
+    .forum-tab.active, .forum-tab:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+    /* ── POSTS FEED ── */
+    .posts-feed { display: flex; flex-direction: column; gap: 14px; }
+    .post-card {
+      background: var(--black-2);
+      border: 1px solid var(--bd-dark);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      transition: all 0.28s;
+    }
+    .post-card:hover { border-color: var(--bd-gold); }
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .post-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      filter: saturate(0.85);
+      border: 1px solid var(--bd-dark);
+    }
+    .post-avatar-init {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--charcoal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--gold);
+      flex-shrink: 0;
+      border: 1px solid var(--bd-dark);
+    }
+    .post-meta { flex: 1; min-width: 0; }
+    .post-author {
+      font-family: var(--font-body);
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 1px;
+    }
+    .post-time {
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.28);
+    }
+    .post-type-tag {
+      padding: 3px 10px;
+      border-radius: 40px;
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .tag-ride    { background: rgba(200,168,75,0.12); color: var(--gold); border: 1px solid rgba(200,168,75,0.25); }
+    .tag-study   { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.6); border: 1px solid var(--bd-dark); }
+    .tag-general { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.45); border: 1px solid var(--bd-dark); }
+    .tag-help    { background: rgba(200,168,75,0.08); color: var(--gold-light); border: 1px solid rgba(200,168,75,0.18); }
+    .post-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 8px;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+    }
+    .post-body {
+      font-family: var(--font-body);
+      font-size: 0.84rem;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.7;
+      font-weight: 400;
+      margin-bottom: 16px;
+    }
+    .post-image {
+      width: 100%;
+      max-height: 240px;
+      object-fit: cover;
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+      display: block;
+      filter: brightness(0.85) saturate(0.75);
+    }
+    .post-actions {
+      display: flex;
+      gap: 4px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      padding-top: 14px;
+    }
+    .post-action-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      background: none;
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--font-body);
+      font-size: 0.76rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.38);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .post-action-btn:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); }
+    .post-action-btn.liked { color: var(--gold); }
+    .ride-card {
+      background: var(--black-3);
+      border: 1px solid var(--bd-gold);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+    .ride-route {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+    .ride-details {
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+    .ride-meta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .ride-chip {
+      padding: 3px 10px;
+      background: rgba(200,168,75,0.09);
+      color: var(--gold);
+      border-radius: 40px;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.06em;
+    }
+    .ride-join {
+      margin-left: auto;
+      padding: 6px 16px;
+      background: var(--gold);
+      color: var(--black);
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--font-body);
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ride-join:hover { background: var(--gold-light); }
+
+    /* ── SIDEBAR ── */
+    .community-sidebar { display: flex; flex-direction: column; gap: 16px; }
+    .sidebar-widget {
+      background: var(--black-2);
+      border: 1px solid var(--bd-dark);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+    .widget-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+    /* Online members */
+    .members-list { display: flex; flex-direction: column; gap: 12px; }
+    .member-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .member-ava {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      filter: saturate(0.85);
+    }
+    .member-name {
+      font-family: var(--font-body);
+      font-size: 0.83rem;
+      font-weight: 500;
+      color: var(--white);
+      flex: 1;
+    }
+    .member-role {
+      font-family: var(--font-body);
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.32);
+    }
+    .online-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #4ade80;
+      flex-shrink: 0;
+    }
+    /* Announcements */
+    .announcement {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--bd-dark);
+    }
+    .announcement:last-child { border-bottom: none; padding-bottom: 0; }
+    .ann-title {
+      font-family: var(--font-body);
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 3px;
+    }
+    .ann-body {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.38);
+      line-height: 1.55;
+    }
+    .ann-date {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--gold);
+      margin-top: 5px;
+      display: block;
+    }
+    /* Topics */
+    .topic-list { display: flex; flex-direction: column; gap: 8px; }
+    .topic-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .topic-row:last-child { border-bottom: none; }
+    .topic-row:hover { opacity: 0.75; }
+    .topic-icon {
+      font-size: 1rem;
+      width: 32px;
+      text-align: center;
+    }
+    .topic-name {
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.6);
+      flex: 1;
+    }
+    .topic-count {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: rgba(255,255,255,0.28);
+    }
+
+    @media (max-width: 1024px) {
+      .community-layout { grid-template-columns: 1fr; }
+      .community-sidebar { display: none; }
+    }
+    @media (max-width: 600px) {
+      .composer-tags { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><span class="logo-icon">◆</span><span>Uni<strong>Thrive+</strong></span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="explore.html">Explore</a></li>
+      <li><a href="finances.html">Finances</a></li>
+      <li><a href="marketplace.html">Marketplace</a></li>
+      <li><a href="community.html" class="active">Community</a></li>
+    </ul>
+    <div class="nav-actions"><a href="finances.html" class="nav-btn">Get Started →</a></div>
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Home</a>
+  <a href="explore.html">Explore</a>
+  <a href="finances.html">Finances</a>
+  <a href="marketplace.html">Marketplace</a>
+  <a href="community.html" class="active">Community</a>
+</div>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <span class="section-tag">// Community Hub</span>
+    <h1>Share, Connect<br>& <em>Thrive Together</em></h1>
+    <p>The MUST student community. Post ride requests, share study tips, ask for help, upload resources, and support each other every step of the way.</p>
+  </div>
+</div>
+
+<section class="community-main" id="forum">
+  <div class="community-layout">
+    <!-- Main feed -->
+    <div>
+      <!-- Composer -->
+      <div class="composer reveal">
+        <div class="composer-top">
+          <div class="composer-avatar">T</div>
+          <textarea class="composer-input" placeholder="Share something with the MUST community — a deal, a ride, a study tip..."></textarea>
+        </div>
+        <div class="composer-actions">
+          <div class="composer-tags">
+            <button class="composer-tag active">General</button>
+            <button class="composer-tag">🚌 Ride Share</button>
+            <button class="composer-tag">📚 Study</button>
+            <button class="composer-tag">❓ Help</button>
+          </div>
+          <button class="post-btn">Post →</button>
+        </div>
+      </div>
+
+      <!-- Forum tabs -->
+      <div class="forum-tabs">
+        <button class="forum-tab active">🔥 Latest</button>
+        <button class="forum-tab">🚌 Rides</button>
+        <button class="forum-tab">📚 Study Groups</button>
+        <button class="forum-tab">💬 General</button>
+        <button class="forum-tab">❓ Help & Advice</button>
+      </div>
+
+      <!-- Ride share post -->
+      <div class="posts-feed">
+
+        <div class="post-card reveal">
+          <div class="post-header">
+            <img class="post-avatar" src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=80&q=80&fit=crop&crop=face" alt="Amara" loading="lazy" />
+            <div class="post-meta">
+              <div class="post-author">Amara Osei</div>
+              <div class="post-time">Today at 7:14 AM · Year 2, Business</div>
+            </div>
+            <span class="post-type-tag tag-ride">🚌 Ride</span>
+          </div>
+          <div class="ride-card">
+            <div class="ride-route">Campus → Mbarara Town Centre</div>
+            <p class="ride-details">Looking for 2 more people to share a taxi this morning. Leaving from the main gate at 8:00 AM sharp. Returning around 1 PM.</p>
+            <div class="ride-meta">
+              <span class="ride-chip">📅 Today, 8:00 AM</span>
+              <span class="ride-chip">👥 2 seats left</span>
+              <span class="ride-chip">💰 UGX 1,000 each</span>
+              <button class="ride-join">Join →</button>
+            </div>
+          </div>
+          <div class="post-actions">
+            <button class="post-action-btn">👍 12 Likes</button>
+            <button class="post-action-btn">💬 4 Replies</button>
+            <button class="post-action-btn">↗ Share</button>
+          </div>
+        </div>
+
+        <div class="post-card reveal reveal-delay-1">
+          <div class="post-header">
+            <img class="post-avatar" src="https://images.unsplash.com/photo-1539571696357-0e4baa482910?w=80&q=80&fit=crop&crop=face" alt="Tendo" loading="lazy" />
+            <div class="post-meta">
+              <div class="post-author">Tendo Mukasa</div>
+              <div class="post-time">Yesterday at 4:30 PM · Year 1, Computer Science</div>
+            </div>
+            <span class="post-type-tag tag-study">📚 Study</span>
+          </div>
+          <div class="post-title">Anyone else studying for the Intro to Programming exam tomorrow?</div>
+          <p class="post-body">I've been going through past papers and found a really clear pattern in the questions. Happy to form a study group at the library tonight — around 7pm. I'll bring printed past papers with my notes. DM me or reply below.</p>
+          <div class="post-actions">
+            <button class="post-action-btn liked">👍 28 Likes</button>
+            <button class="post-action-btn">💬 11 Replies</button>
+            <button class="post-action-btn">↗ Share</button>
+          </div>
+        </div>
+
+        <div class="post-card reveal">
+          <div class="post-header">
+            <div class="post-avatar-init">BN</div>
+            <div class="post-meta">
+              <div class="post-author">Brenda Nakato</div>
+              <div class="post-time">2 days ago · Year 3, Law</div>
+            </div>
+            <span class="post-type-tag tag-general">💬 General</span>
+          </div>
+          <div class="post-title">Tried the new deals at Nile Restaurant — genuinely worth it</div>
+          <!-- African students eating at restaurant -->
+          <img class="post-image" src="https://images.unsplash.com/photo-1567521464027-f127ff144326?w=700&q=80&fit=crop" alt="Food" loading="lazy" />
+          <p class="post-body">Finally tried the 30% student discount at Nile Restaurant. Full meal for UGX 3,500 — rice, stew, and a drink. Just show your student ID. The food is genuinely good. No more overpriced cafeteria for me on Fridays!</p>
+          <div class="post-actions">
+            <button class="post-action-btn liked">👍 45 Likes</button>
+            <button class="post-action-btn">💬 17 Replies</button>
+            <button class="post-action-btn">↗ Share</button>
+          </div>
+        </div>
+
+        <div class="post-card reveal reveal-delay-1">
+          <div class="post-header">
+            <img class="post-avatar" src="https://images.unsplash.com/photo-1529390079861-591de354faf5?w=80&q=80&fit=crop&crop=face" alt="Grace" loading="lazy" />
+            <div class="post-meta">
+              <div class="post-author">Grace Tumwebaze</div>
+              <div class="post-time">3 days ago · Year 2, Nursing</div>
+            </div>
+            <span class="post-type-tag tag-help">❓ Help</span>
+          </div>
+          <div class="post-title">Does anyone know a good, affordable doctor near campus?</div>
+          <p class="post-body">I've been having bad headaches for a week. The campus clinic queue is always too long. Is there a clinic within walking distance that's student-friendly and not too expensive? Would really appreciate any recommendations.</p>
+          <div class="post-actions">
+            <button class="post-action-btn">👍 19 Likes</button>
+            <button class="post-action-btn">💬 22 Replies</button>
+            <button class="post-action-btn">↗ Share</button>
+          </div>
+        </div>
+
+        <div class="post-card reveal">
+          <div class="post-header">
+            <div class="post-avatar-init">JO</div>
+            <div class="post-meta">
+              <div class="post-author">James Odhiambo</div>
+              <div class="post-time">4 days ago · Year 3, BIT</div>
+            </div>
+            <span class="post-type-tag tag-ride">🚌 Ride</span>
+          </div>
+          <div class="ride-card">
+            <div class="ride-route">Mbarara Town → MUST Campus</div>
+            <p class="ride-details">I drive past campus every morning at 7:30 AM from town. Happy to take 2–3 students regularly. Consistent schedule, Mon–Fri.</p>
+            <div class="ride-meta">
+              <span class="ride-chip">📅 Daily, 7:30 AM</span>
+              <span class="ride-chip">👥 3 seats</span>
+              <span class="ride-chip">💰 UGX 800 each</span>
+              <button class="ride-join">Join →</button>
+            </div>
+          </div>
+          <div class="post-actions">
+            <button class="post-action-btn">👍 34 Likes</button>
+            <button class="post-action-btn">💬 9 Replies</button>
+            <button class="post-action-btn">↗ Share</button>
+          </div>
+        </div>
+
+        <div class="post-card reveal reveal-delay-1">
+          <div class="post-header">
+            <img class="post-avatar" src="https://images.unsplash.com/photo-1596495577886-d920f1fb7238?w=80&q=80&fit=crop&crop=faces" alt="Sylvia" loading="lazy" />
+            <div class="post-meta">
+              <div class="post-author">Sylvia Apio</div>
+              <div class="post-time">5 days ago · Year 1, BIT</div>
+            </div>
+            <span class="post-type-tag tag-study">📚 Study</span>
+          </div>
+          <div class="post-title">Free Database Systems notes — typed and ready to download</div>
+          <p class="post-body">Spent the whole weekend typing up clean notes for Database Systems. Covers ER diagrams, normalization (1NF to 3NF), SQL joins and transactions. Download link on the Explore page under Study Resources. Hope it helps everyone preparing for exams!</p>
+          <div class="post-actions">
+            <button class="post-action-btn liked">👍 72 Likes</button>
+            <button class="post-action-btn">💬 31 Replies</button>
+            <button class="post-action-btn">↗ Share</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="community-sidebar">
+
+      <!-- Online now -->
+      <div class="sidebar-widget reveal">
+        <div class="widget-title">Online Now</div>
+        <div class="members-list">
+          <div class="member-row">
+            <img class="member-ava" src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=60&q=80&fit=crop&crop=face" alt="Amara" loading="lazy" />
+            <div>
+              <div class="member-name">Amara O.</div>
+              <div class="member-role">Year 2 · Business</div>
+            </div>
+            <div class="online-dot"></div>
+          </div>
+          <div class="member-row">
+            <img class="member-ava" src="https://images.unsplash.com/photo-1539571696357-0e4baa482910?w=60&q=80&fit=crop&crop=face" alt="Tendo" loading="lazy" />
+            <div>
+              <div class="member-name">Tendo M.</div>
+              <div class="member-role">Year 1 · CS</div>
+            </div>
+            <div class="online-dot"></div>
+          </div>
+          <div class="member-row">
+            <img class="member-ava" src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=60&q=80&fit=crop&crop=face" alt="Brenda" loading="lazy" />
+            <div>
+              <div class="member-name">Brenda N.</div>
+              <div class="member-role">Year 3 · Law</div>
+            </div>
+            <div class="online-dot"></div>
+          </div>
+          <div class="member-row">
+            <div class="post-avatar-init" style="width:34px;height:34px;font-size:0.75rem;">GT</div>
+            <div>
+              <div class="member-name">Grace T.</div>
+              <div class="member-role">Year 2 · Nursing</div>
+            </div>
+            <div class="online-dot"></div>
+          </div>
+        </div>
+        <p style="font-family:var(--font-body);font-size:0.72rem;color:rgba(255,255,255,0.28);margin-top:14px;">+124 students online today</p>
+      </div>
+
+      <!-- Announcements -->
+      <div class="sidebar-widget reveal reveal-delay-1">
+        <div class="widget-title">📢 Announcements</div>
+        <div class="announcement">
+          <div class="ann-title">End-of-Semester Exams Begin</div>
+          <p class="ann-body">Exam week runs 9–20 June. Library extended hours: 6 AM – 11 PM daily.</p>
+          <span class="ann-date">Posted 2 days ago</span>
+        </div>
+        <div class="announcement">
+          <div class="ann-title">New Hostel Listings Added</div>
+          <p class="ann-body">8 new verified hostel options within 500m of campus have been listed on Explore.</p>
+          <span class="ann-date">Posted 4 days ago</span>
+        </div>
+        <div class="announcement">
+          <div class="ann-title">Bursary Disbursement</div>
+          <p class="ann-body">Government bursaries for Semester 2 will be processed by end of month.</p>
+          <span class="ann-date">Posted 1 week ago</span>
+        </div>
+      </div>
+
+      <!-- Topics -->
+      <div class="sidebar-widget reveal reveal-delay-2">
+        <div class="widget-title">Popular Topics</div>
+        <div class="topic-list">
+          <div class="topic-row"><span class="topic-icon">🚌</span><span class="topic-name">Ride Sharing</span><span class="topic-count">84 posts</span></div>
+          <div class="topic-row"><span class="topic-icon">📚</span><span class="topic-name">Study Groups</span><span class="topic-count">67 posts</span></div>
+          <div class="topic-row"><span class="topic-icon">🏠</span><span class="topic-name">Housing Tips</span><span class="topic-count">52 posts</span></div>
+          <div class="topic-row"><span class="topic-icon">💰</span><span class="topic-name">Budget Advice</span><span class="topic-count">48 posts</span></div>
+          <div class="topic-row"><span class="topic-icon">🍽️</span><span class="topic-name">Food Spots</span><span class="topic-count">43 posts</span></div>
+          <div class="topic-row"><span class="topic-icon">❓</span><span class="topic-name">Help & Advice</span><span class="topic-count">39 posts</span></div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">◆ Uni<strong>Thrive+</strong></div>
+      <p class="footer-tagline">Smart affordable living for every university student at MUST and beyond.</p>
+      <p class="footer-copy">© 2025 UniThrive+ · Group Two, BIT Year 1 · MUST</p>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <a href="explore.html">Explore Listings</a>
+        <a href="finances.html">Budget Tracker</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="community.html">Community</a>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <a href="explore.html#resources">Study Materials</a>
+        <a href="explore.html#deals">Deals Board</a>
+        <a href="community.html#forum">Forums</a>
+      </div>
+      <div class="footer-col">
+        <h4>About</h4>
+        <a href="#">Project Proposal</a>
+        <a href="#">Our Team</a>
+        <a href="#">GitHub</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-divider"></div>
+  <div class="footer-bottom">
+    <span>Built with ♥ at Mbarara University of Science and Technology</span>
+    <div class="footer-bottom-links"><a href="#">Privacy</a><a href="#">Terms</a></div>
+  </div>
+</footer>
+
+<script src="shared.js"></script>
+<script>
+  // Composer tag toggle
+  document.querySelectorAll('.composer-tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+      document.querySelectorAll('.composer-tag').forEach(t => t.classList.remove('active'));
+      tag.classList.add('active');
+    });
+  });
+  // Forum tab toggle
+  document.querySelectorAll('.forum-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.forum-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+  // Like button toggle
+  document.querySelectorAll('.post-action-btn').forEach(btn => {
+    if (btn.textContent.includes('Like')) {
+      btn.addEventListener('click', () => btn.classList.toggle('liked'));
+    }
+  });
+  // Post button
+  document.querySelector('.post-btn').addEventListener('click', () => {
+    const ta = document.querySelector('.composer-input');
+    if (ta.value.trim()) {
+      alert('Your post has been shared with the MUST community!');
+      ta.value = '';
+    }
+  });
+</script>
+</body>
+</html>

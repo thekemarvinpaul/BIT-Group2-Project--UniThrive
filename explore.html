@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Explore |UniThrive+</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    /* ── SEARCH ── */
+    .search-bar-wrap {
+      background: var(--black-3);
+      padding: 0 6vw 40px;
+    }
+    .search-bar {
+      display: flex;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-dark);
+      border-radius: 4px;
+      overflow: hidden;
+      max-width: 780px;
+    }
+    .search-bar input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      padding: 16px 22px;
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+      color: var(--white);
+    }
+    .search-bar input::placeholder { color: rgba(255,255,255,0.3); }
+    .search-select {
+      background: none;
+      border: none;
+      border-left: 1px solid var(--border-dark);
+      padding: 0 18px;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.5);
+      outline: none;
+      cursor: pointer;
+    }
+    .search-select option { background: var(--black-2); }
+    .search-btn {
+      background: var(--gold);
+      border: none;
+      padding: 16px 26px;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--black);
+      letter-spacing: 0.04em;
+      transition: background 0.2s;
+    }
+    .search-btn:hover { background: var(--gold-light); }
+
+    /* ── CATEGORY TABS ── */
+    .cat-tabs {
+      background: var(--black-2);
+      border-bottom: 1px solid var(--border-dark);
+      padding: 0 6vw;
+      position: sticky;
+      top: var(--nav-h);
+      z-index: 100;
+    }
+    .cat-tabs-inner {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .cat-tabs-inner::-webkit-scrollbar { display: none; }
+    .cat-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 22px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.45);
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s;
+      margin-bottom: -1px;
+      letter-spacing: 0.02em;
+    }
+    .cat-tab.active, .cat-tab:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+    /* ── LISTINGS LAYOUT ── */
+    .listings-main {
+      padding: 48px 6vw 80px;
+      background: var(--black);
+    }
+    .listings-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    /* ── FILTERS ── */
+    .filters-panel {
+      background: var(--black-2);
+      border: 1px solid var(--border-dark);
+      border-radius: 2px;
+      padding: 28px;
+      position: sticky;
+      top: calc(var(--nav-h) + 64px);
+    }
+    .filters-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-dark);
+    }
+    .filter-group { margin-bottom: 24px; }
+    .filter-label {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
+      display: block;
+    }
+    .filter-options { display: flex; flex-direction: column; gap: 8px; }
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .filter-option input[type="checkbox"],
+    .filter-option input[type="radio"] {
+      accent-color: var(--gold);
+      width: 15px; height: 15px;
+      cursor: pointer;
+    }
+    .filter-option span {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.65);
+    }
+    .filter-option .count {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.3);
+    }
+    .price-range { display: flex; gap: 8px; }
+    .price-range input {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      padding: 8px 10px;
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      color: var(--white);
+      outline: none;
+    }
+    .price-range input:focus { border-color: var(--gold); }
+    .filter-apply {
+      width: 100%;
+      padding: 12px;
+      background: var(--gold);
+      color: var(--black);
+      border: none;
+      border-radius: 3px;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      letter-spacing: 0.04em;
+    }
+    .filter-apply:hover { background: var(--gold-light); }
+
+    /* ── LISTINGS GRID ── */
+    .listings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .listings-count {
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.4);
+    }
+    .listings-count strong { color: var(--white); font-weight: 600; }
+    .sort-select {
+      background: var(--black-2);
+      border: 1px solid var(--border-dark);
+      border-radius: 4px;
+      padding: 8px 14px;
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.65);
+      outline: none;
+      cursor: pointer;
+    }
+    .sort-select option { background: var(--black-2); }
+    .listings-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    .listing-card {
+      background: var(--black-2);
+      border: 1px solid var(--border-dark);
+      border-radius: 2px;
+      overflow: hidden;
+      transition: all 0.35s;
+      cursor: pointer;
+      position: relative;
+    }
+    .listing-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      border-color: rgba(201,168,76,0.3);
+    }
+    .listing-badge {
+      position: absolute;
+      top: 12px; left: 12px;
+      padding: 4px 10px;
+      border-radius: 2px;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      z-index: 1;
+      text-transform: uppercase;
+    }
+    .badge-food { background: rgba(201,168,76,0.9); color: var(--black); }
+    .badge-housing { background: rgba(255,255,255,0.9); color: var(--black); }
+    .badge-transport { background: rgba(50,50,50,0.9); color: var(--white); border: 1px solid rgba(255,255,255,0.2); }
+    .badge-study { background: var(--gold-dark); color: var(--white); }
+    .badge-deal { background: var(--black); color: var(--gold); border: 1px solid var(--gold); }
+    .listing-img-wrap { overflow: hidden; }
+    .listing-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s;
+      filter: brightness(0.85) saturate(0.75);
+    }
+    .listing-card:hover .listing-img { transform: scale(1.06); }
+    .listing-body { padding: 18px 20px 20px; }
+    .listing-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+    .listing-desc {
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.55;
+      font-weight: 300;
+      margin-bottom: 14px;
+    }
+    .listing-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .listing-price {
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .listing-price .old {
+      text-decoration: line-through;
+      color: rgba(255,255,255,0.3);
+      font-size: 0.7rem;
+      display: block;
+    }
+    .listing-location {
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.35);
+    }
+    .listing-save {
+      background: none;
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      padding: 5px 9px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.4);
+      transition: all 0.2s;
+    }
+    .listing-save:hover { background: rgba(201,168,76,0.15); border-color: var(--gold); color: var(--gold); }
+
+    /* ── DEALS SECTION ── */
+    .deals-section {
+      padding: 80px 6vw;
+      background: var(--black-2);
+      border-top: 1px solid var(--border-dark);
+    }
+    .deals-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 40px;
+    }
+    .deals-header .section-title { margin-bottom: 0; }
+    .see-all-link {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      color: var(--gold);
+      font-weight: 500;
+    }
+    .deals-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .deal-card {
+      background: var(--black-3);
+      border: 1px solid var(--border-dark);
+      border-radius: 2px;
+      padding: 28px;
+      transition: all 0.3s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .deal-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--gold);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+    .deal-card:hover::after { transform: scaleX(1); }
+    .deal-card:hover { border-color: rgba(201,168,76,0.25); transform: translateY(-4px); }
+    .deal-discount {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+    .deal-biz {
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+    .deal-desc {
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.55;
+      margin-bottom: 16px;
+      font-weight: 300;
+    }
+    .deal-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(201,168,76,0.12);
+      color: var(--gold);
+      border-radius: 2px;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── RESOURCES ── */
+    .resources-section {
+      padding: 80px 6vw;
+      background: var(--black);
+    }
+    .resources-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 40px;
+    }
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .resource-item {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      background: var(--black-2);
+      border: 1px solid var(--border-dark);
+      border-radius: 2px;
+      padding: 22px;
+      transition: all 0.25s;
+      cursor: pointer;
+    }
+    .resource-item:hover {
+      border-color: rgba(201,168,76,0.3);
+      background: var(--black-3);
+    }
+    .resource-icon {
+      font-size: 1.6rem;
+      width: 50px; height: 50px;
+      background: rgba(201,168,76,0.08);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .resource-title {
+      font-family: var(--font-display);
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+    .resource-meta {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 10px;
+    }
+    .resource-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .resource-tag {
+      padding: 3px 8px;
+      background: rgba(201,168,76,0.1);
+      color: var(--gold);
+      border-radius: 2px;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+    }
+    .resource-download {
+      margin-left: auto;
+      padding: 8px 16px;
+      background: none;
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      cursor: pointer;
+      color: var(--gold);
+      transition: all 0.2s;
+      align-self: center;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .resource-download:hover { background: rgba(201,168,76,0.12); border-color: var(--gold); }
+
+    @media (max-width: 1024px) {
+      .listings-layout { grid-template-columns: 1fr; }
+      .filters-panel { display: none; }
+      .listings-grid { grid-template-columns: repeat(2, 1fr); }
+      .deals-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .listings-grid, .deals-grid, .resources-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><span class="logo-icon">◆</span><span>Campus<strong>Budget+</strong></span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="explore.html" class="active">Explore</a></li>
+      <li><a href="finances.html">Finances</a></li>
+      <li><a href="marketplace.html">Marketplace</a></li>
+      <li><a href="community.html">Community</a></li>
+    </ul>
+    <div class="nav-actions"><a href="finances.html" class="nav-btn">Get Started →</a></div>
+    <button class="nav-hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Home</a>
+  <a href="explore.html" class="active">Explore</a>
+  <a href="finances.html">Finances</a>
+  <a href="marketplace.html">Marketplace</a>
+  <a href="community.html">Community</a>
+</div>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <span class="section-tag">// Explore & Discover</span>
+    <h1>Find <em>Affordable</em><br>Everything Near You</h1>
+    <p>Browse verified listings for food, housing, transport, deals and academic resources — curated by your fellow students.</p>
+  </div>
+</div>
+
+<div class="search-bar-wrap">
+  <div class="search-bar">
+    <input type="text" placeholder="Search food, housing, transport, deals..." />
+    <select class="search-select">
+      <option>Near Me</option>
+      <option>On Campus</option>
+      <option>Within 1km</option>
+      <option>Within 5km</option>
+    </select>
+    <button class="search-btn">Search</button>
+  </div>
+</div>
+
+<div class="cat-tabs">
+  <div class="cat-tabs-inner">
+    <button class="cat-tab active" onclick="filterCat(this,'all')">All Listings</button>
+    <button class="cat-tab" onclick="filterCat(this,'food')">🍽️ Food & Meals</button>
+    <button class="cat-tab" onclick="filterCat(this,'housing')">🏠 Housing</button>
+    <button class="cat-tab" onclick="filterCat(this,'transport')">🚌 Transport</button>
+    <button class="cat-tab" onclick="filterCat(this,'study')">📚 Study</button>
+    <button class="cat-tab" onclick="filterCat(this,'deals')">🏷️ Deals</button>
+  </div>
+</div>
+
+<section class="listings-main">
+  <div class="listings-layout">
+    <aside class="filters-panel">
+      <div class="filters-title">Filters</div>
+      <div class="filter-group">
+        <span class="filter-label">Category</span>
+        <div class="filter-options">
+          <label class="filter-option"><input type="checkbox" checked /><span>Food & Meals</span><span class="count">48</span></label>
+          <label class="filter-option"><input type="checkbox" checked /><span>Housing</span><span class="count">23</span></label>
+          <label class="filter-option"><input type="checkbox" checked /><span>Transport</span><span class="count">31</span></label>
+          <label class="filter-option"><input type="checkbox" checked /><span>Study Materials</span><span class="count">67</span></label>
+          <label class="filter-option"><input type="checkbox" /><span>Electronics</span><span class="count">19</span></label>
+        </div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Price (UGX)</span>
+        <div class="price-range">
+          <input type="number" placeholder="Min" value="0" />
+          <input type="number" placeholder="Max" value="50000" />
+        </div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Distance</span>
+        <div class="filter-options">
+          <label class="filter-option"><input type="radio" name="dist" checked /><span>On Campus</span></label>
+          <label class="filter-option"><input type="radio" name="dist" /><span>Within 500m</span></label>
+          <label class="filter-option"><input type="radio" name="dist" /><span>Within 1km</span></label>
+          <label class="filter-option"><input type="radio" name="dist" /><span>Within 5km</span></label>
+        </div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Verified</span>
+        <div class="filter-options">
+          <label class="filter-option"><input type="checkbox" checked /><span>Student Verified</span></label>
+          <label class="filter-option"><input type="checkbox" /><span>Featured</span></label>
+        </div>
+      </div>
+      <button class="filter-apply">Apply Filters</button>
+    </aside>
+
+    <div>
+      <div class="listings-header">
+        <span class="listings-count"><strong>188</strong> listings found</span>
+        <select class="sort-select">
+          <option>Most Relevant</option>
+          <option>Lowest Price</option>
+          <option>Nearest First</option>
+          <option>Newest First</option>
+        </select>
+      </div>
+      <div class="listings-grid" id="listingsGrid">
+        <div class="listing-card reveal" data-cat="food">
+          <span class="listing-badge badge-food">Food</span>
+          <div class="listing-img-wrap">
+            <img class="listing-img" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80&fit=crop" alt="Cafeteria" loading="lazy" />
+          </div>
+          <div class="listing-body">
+            <div class="listing-title">Main Campus Cafeteria</div>
+            <p class="listing-desc">Full lunch with rice, beans & protein. Student discount weekdays.</p>
+            <div class="listing-meta">
+              <div class="listing-price"><span class="old">UGX 4,500</span>UGX 2,500</div>
+              <span class="listing-location">📍 Block A</span>
+              <button class="listing-save">♡</button>
+            </div>
+          </div>
+        </div>
+        <div class="listing-card reveal" data-cat="housing">
+          <span class="listing-badge badge-housing">Housing</span>
+          <div class="listing-img-wrap">
+            <img class="listing-img" src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400&q=80&fit=crop" alt="Hostel" loading="lazy" />
+          </div>
+          <div class="listing-body">
+            <div class="listing-title">Bright Student Hostel</div>
+            <p class="listing-desc">Self-contained room, water included. 200m from main gate.</p>
+            <div class="listing-meta">
+              <div class="listing-price">UGX 120K/mo</div>
+              <span class="listing-location">📍 200m from campus</span>
+              <button class="listing-save">♡</button>
+            </div>
+          </div>
+        </div>
+        <div class="listing-card reveal" data-cat="transport">
+          <span class="listing-badge badge-transport">Transport</span>
+          <div class="listing-img-wrap">
+            <img class="listing-img" src="https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=400&q=80&fit=crop" alt="Transport" loading="lazy" />
+          </div>
+          <div class="listing-body">
+            <div class="listing-title">Daily Ride to Town</div>
+            <p class="listing-desc">Shared taxi from campus to town. 7am and 5pm daily.</p>
+            <div class="listing-meta">
+              <div class="listing-price">UGX 500</div>
+              <span class="listing-location">📍 Main Gate</span>
+              <button class="listing-save">♡</button>
+            </div>
+          </div>
+        </div>
+        <div class="listing-card reveal" data-cat="study">
+          <span class="listing-badge badge-study">Study</span>
+          <div class="listing-img-wrap">
+            <img class="listing-img" src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80&fit=crop" alt="Books" loading="lazy" />
+          </div>
+          <div class="listing-body">
+            <div class="listing-title">BIT Year 1 Textbooks</div>
+            <p class="listing-desc">Full set of Year 1 BIT textbooks in good condition.</p>
+            <div class="listing-meta">
+              <div class="listing-price"><span class="old">UGX 85,000</span>UGX 35,000</div>
+              <span class="listing-location">📍 Library</span>
+              <button class="listing-save">♡</button>
+            </div>
+          </div>
+        </div>
+        <div class="listing-card reveal" data-cat="deals">
+          <span class="listing-badge badge-deal">Deal</span>
+          <div class="listing-img-wrap">
+            <img class="listing-img" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&q=80&fit=crop" alt="Pizza deal" loading="lazy" />
+          </div>
+          <div class="listing-body">
+            <div class="listing-title">Pizza Hut Student Night</div>
+            <p class="listing-desc">Every Wednesday: buy one pizza, get one free. Show student ID.</p>
+            <div class="listing-meta">
+              <div class="listing-price">50% OFF</div>
+              <span class="listing-location">📍 Town Centre</span>
+              <button class="listing-save">♡</button>
+            </div>
+          </div>
+        </div>
+        <div class="listing-card reveal" data-cat="food">
+          <span class="listing-badge badge-food">Food</span>
+          <div class="listing-img-wrap">
+            <img class="listing-img" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80&fit=crop" alt="Mama's Kitchen" loading="lazy" />
+          </div>
+          <div class="listing-body">
+            <div class="listing-title">Mama's Kitchen</div>
+            <p class="listing-desc">Home-cooked Ugandan meals. Matooke, groundnut stew, posho.</p>
+            <div class="listing-meta">
+              <div class="listing-price">UGX 3,000</div>
+              <span class="listing-location">📍 Off Campus</span>
+              <button class="listing-save">♡</button>
+            </div>
+          </div>
+        </div>
+        <div class="listing-card reveal" data-cat="housing">
+          <span class="listing-badge badge-housing">Housing</span>
+          <div class="listing-img-wrap">
+            <img class="listing-img" src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&q=80&fit=crop" alt="Apartment" loading="lazy" />
+          </div>
+          <div class="listing-body">
+            <div class="listing-title">Shared Apartment — 3 Rooms</div>
+            <p class="listing-desc">Looking for 2 housemates. Internet included. 5 min walk.</p>
+            <div class="listing-meta">
+              <div class="listing-price">UGX 90K/mo</div>
+              <span class="listing-location">📍 5min walk</span>
+              <button class="listing-save">♡</button>
+            </div>
+          </div>
+        </div>
+        <div class="listing-card reveal" data-cat="study">
+          <span class="listing-badge badge-study">Study</span>
+          <div class="listing-img-wrap">
+            <img class="listing-img" src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&q=80&fit=crop" alt="Notes" loading="lazy" />
+          </div>
+          <div class="listing-body">
+            <div class="listing-title">Database Systems Notes</div>
+            <p class="listing-desc">Detailed typed notes. Includes past paper answers and diagrams.</p>
+            <div class="listing-meta">
+              <div class="listing-price">FREE</div>
+              <span class="listing-location">📍 Digital</span>
+              <button class="listing-save">♡</button>
+            </div>
+          </div>
+        </div>
+        <div class="listing-card reveal" data-cat="transport">
+          <span class="listing-badge badge-transport">Transport</span>
+          <div class="listing-img-wrap">
+            <img class="listing-img" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80&fit=crop" alt="Boda" loading="lazy" />
+          </div>
+          <div class="listing-body">
+            <div class="listing-title">Campus Boda Network</div>
+            <p class="listing-desc">Trusted riders 6am–10pm. Fixed student fares guaranteed.</p>
+            <div class="listing-meta">
+              <div class="listing-price">From UGX 800</div>
+              <span class="listing-location">📍 Campus</span>
+              <button class="listing-save">♡</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEALS -->
+<section class="deals-section" id="deals">
+  <div class="deals-header reveal">
+    <div>
+      <span class="section-tag">// Today's Deals</span>
+      <h2 class="section-title">Hot Deals &<br><em>Discounts</em></h2>
+    </div>
+    <a href="#" class="see-all-link">See all →</a>
+  </div>
+  <div class="deals-grid reveal">
+    <div class="deal-card">
+      <div class="deal-discount">30%</div>
+      <div class="deal-biz">Nile Restaurant</div>
+      <p class="deal-desc">Student lunch special. Show your student ID for instant discount on meals over UGX 5,000.</p>
+      <span class="deal-tag">FOOD</span>
+    </div>
+    <div class="deal-card">
+      <div class="deal-discount">50%</div>
+      <div class="deal-biz">Campus Prints</div>
+      <p class="deal-desc">Print your notes at half price this week. A4 pages, full colour. Walk-in or order online.</p>
+      <span class="deal-tag">ACADEMIC</span>
+    </div>
+    <div class="deal-card">
+      <div class="deal-discount">FREE</div>
+      <div class="deal-biz">FitLife Gym</div>
+      <p class="deal-desc">Free 7-day trial for first-time university students. Full access to all gym equipment.</p>
+      <span class="deal-tag">WELLNESS</span>
+    </div>
+    <div class="deal-card">
+      <div class="deal-discount">25%</div>
+      <div class="deal-biz">TechHub Repairs</div>
+      <p class="deal-desc">Laptop and phone repairs for students. Show university ID. Offer valid Mon–Fri.</p>
+      <span class="deal-tag">TECH</span>
+    </div>
+  </div>
+</section>
+
+<!-- RESOURCES -->
+<section class="resources-section" id="resources">
+  <div class="resources-header reveal">
+    <div>
+      <span class="section-tag">// Resource Sharing</span>
+      <h2 class="section-title">Study <em>Resources</em><br>Shared by Students</h2>
+    </div>
+    <a href="community.html" class="btn-outline-gold">Upload Resource</a>
+  </div>
+  <div class="resources-grid">
+    <div class="resource-item reveal">
+      <div class="resource-icon">📄</div>
+      <div>
+        <div class="resource-title">Introduction to Programming — Complete Notes</div>
+        <div class="resource-meta">Uploaded by Kyobe Joel · 3 days ago · 124 downloads</div>
+        <div class="resource-tags">
+          <span class="resource-tag">BIT Year 1</span>
+          <span class="resource-tag">PDF</span>
+          <span class="resource-tag">Programming</span>
+        </div>
+      </div>
+      <button class="resource-download">↓ Get</button>
+    </div>
+    <div class="resource-item reveal reveal-delay-1">
+      <div class="resource-icon">📊</div>
+      <div>
+        <div class="resource-title">Data Structures & Algorithms Revision Pack</div>
+        <div class="resource-meta">Uploaded by Marvin T. · 1 week ago · 89 downloads</div>
+        <div class="resource-tags">
+          <span class="resource-tag">BIT Year 2</span>
+          <span class="resource-tag">PDF</span>
+          <span class="resource-tag">DSA</span>
+        </div>
+      </div>
+      <button class="resource-download">↓ Get</button>
+    </div>
+    <div class="resource-item reveal">
+      <div class="resource-icon">📐</div>
+      <div>
+        <div class="resource-title">Mathematics for Computing — Past Papers (3 Years)</div>
+        <div class="resource-meta">Uploaded by Pellan A. · 2 weeks ago · 203 downloads</div>
+        <div class="resource-tags">
+          <span class="resource-tag">Year 1</span>
+          <span class="resource-tag">PDF</span>
+          <span class="resource-tag">Maths</span>
+        </div>
+      </div>
+      <button class="resource-download">↓ Get</button>
+    </div>
+    <div class="resource-item reveal reveal-delay-1">
+      <div class="resource-icon">🌐</div>
+      <div>
+        <div class="resource-title">Web Technologies — Lab Manual & Examples</div>
+        <div class="resource-meta">Uploaded by Sylus A. · 5 days ago · 67 downloads</div>
+        <div class="resource-tags">
+          <span class="resource-tag">Year 2</span>
+          <span class="resource-tag">HTML/CSS</span>
+          <span class="resource-tag">Lab</span>
+        </div>
+      </div>
+      <button class="resource-download">↓ Get</button>
+    </div>
+    <div class="resource-item reveal">
+      <div class="resource-icon">🔒</div>
+      <div>
+        <div class="resource-title">Computer Networks & Security Notes</div>
+        <div class="resource-meta">Uploaded by Wilson O. · 1 day ago · 42 downloads</div>
+        <div class="resource-tags">
+          <span class="resource-tag">Year 3</span>
+          <span class="resource-tag">Networking</span>
+          <span class="resource-tag">PDF</span>
+        </div>
+      </div>
+      <button class="resource-download">↓ Get</button>
+    </div>
+    <div class="resource-item reveal reveal-delay-1">
+      <div class="resource-icon">💾</div>
+      <div>
+        <div class="resource-title">Database Systems Design — Project Templates</div>
+        <div class="resource-meta">Uploaded by Dan A. · 4 days ago · 55 downloads</div>
+        <div class="resource-tags">
+          <span class="resource-tag">Year 2</span>
+          <span class="resource-tag">DOCX</span>
+          <span class="resource-tag">DB</span>
+        </div>
+      </div>
+      <button class="resource-download">↓ Get</button>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">◆ Uni<strong>Thrive+</strong></div>
+      <p class="footer-tagline">Smart affordable living for every university student.</p>
+      <p class="footer-copy">© 2025 UniThrive+ · Group Two, BIT Year 1 · MUST</p>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <a href="explore.html">Explore Listings</a>
+        <a href="finances.html">Budget Tracker</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="community.html">Community</a>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <a href="explore.html#resources">Study Materials</a>
+        <a href="explore.html#deals">Deals Board</a>
+        <a href="community.html#forum">Forums</a>
+      </div>
+      <div class="footer-col">
+        <h4>About</h4>
+        <a href="#">Project Proposal</a>
+        <a href="#">Team</a>
+        <a href="#">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="shared.js"></script>
+<script>
+  function filterCat(btn, cat) {
+    document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.listing-card').forEach(card => {
+      card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
+    });
+  }
+</script>
+</body>
+</html>
