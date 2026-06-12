@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniThrive+ | Smart Student Living</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    /* ══════════════════ HERO ══════════════════ */
+    .hero {
+      position: relative;
+      height: 100vh;
+      min-height: 700px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=90&fit=crop&crop=top');
+      background-size: cover;
+      background-position: center 20%;
+      transform: scale(1.05);
+      transition: transform 10s ease-out;
+      filter: brightness(0.55);
+    }
+    .hero-bg.loaded { transform: scale(1); }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        115deg,
+        rgba(0,0,0,0.88) 0%,
+        rgba(5,5,5,0.72) 45%,
+        rgba(0,0,0,0.35) 100%
+      );
+    }
+    /* Gold grain texture overlay */
+    .hero-grain {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      opacity: 0.4;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 0 6vw;
+      max-width: 860px;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(201,168,76,0.4);
+      border-radius: 2px;
+      padding: 7px 20px;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.3s forwards;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: pulse 2s infinite;
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(3.2rem, 7.5vw, 6.5rem);
+      font-weight: 700;
+      line-height: 1.0;
+      color: var(--white);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 1s 0.5s forwards;
+      letter-spacing: -0.02em;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+      display: block;
+    }
+    .hero-sub {
+      font-family: var(--font-body);
+      font-size: 1.1rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.75;
+      max-width: 480px;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.7s forwards;
+    }
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.9s forwards;
+    }
+    /* Hero stats */
+    .hero-stats {
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      z-index: 2;
+      display: flex;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      opacity: 0;
+      animation: fadeIn 1s 1.2s forwards;
+    }
+    .hero-stat {
+      flex: 1;
+      padding: 28px 6vw;
+      border-right: 1px solid rgba(255,255,255,0.07);
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+    }
+    .hero-stat:last-child { border-right: none; }
+    .hero-stat-num {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .hero-stat-label {
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.45);
+      font-weight: 300;
+      letter-spacing: 0.06em;
+    }
+    /* Scroll indicator */
+    .hero-scroll {
+      position: absolute;
+      right: 6vw;
+      bottom: 120px;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      animation: fadeIn 1s 1.4s forwards;
+    }
+    .scroll-text {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      writing-mode: vertical-rl;
+    }
+    .scroll-line {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, rgba(201,168,76,0.8), transparent);
+      animation: scrollAnim 1.8s ease-in-out infinite;
+    }
+    @keyframes scrollAnim {
+      0%,100% { transform: scaleY(1); opacity:1; }
+      50% { transform: scaleY(0.4); opacity:0.3; }
+    }
+
+    /* ══════════════════ TICKER ══════════════════ */
+    .ticker {
+      background: var(--gold);
+      padding: 12px 0;
+      overflow: hidden;
+    }
+    .ticker-track {
+      display: flex;
+      white-space: nowrap;
+      animation: tickerAnim 28s linear infinite;
+    }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 32px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: var(--black);
+      font-weight: 700;
+      text-transform: uppercase;
+      border-right: 1px solid rgba(0,0,0,0.15);
+    }
+    @keyframes tickerAnim {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ══════════════════ INTRO STRIP ══════════════════ */
+    .intro-strip {
+      background: var(--black-3);
+      padding: 72px 6vw;
+      border-bottom: 1px solid var(--border-dark);
+    }
+    .intro-strip-inner {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .intro-text .section-title { font-size: clamp(2rem, 3.5vw, 2.8rem); }
+    .intro-lead {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-style: italic;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.6;
+      margin-bottom: 32px;
+      font-weight: 300;
+    }
+    .intro-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .intro-feat {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .intro-feat-icon {
+      width: 40px; height: 40px;
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .intro-feat-title {
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 3px;
+    }
+    .intro-feat-text {
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.4);
+      font-weight: 300;
+      line-height: 1.5;
+    }
+    /* Stats on right */
+    .intro-stats-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border-dark);
+      border: 1px solid var(--border-dark);
+    }
+    .intro-stat-box {
+      background: var(--black-2);
+      padding: 36px 28px;
+      transition: background 0.3s;
+    }
+    .intro-stat-box:hover { background: var(--black-3); }
+    .intro-stat-num {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .intro-stat-label {
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.4);
+      font-weight: 300;
+    }
+    .intro-stat-box.featured {
+      background: var(--gold);
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .intro-stat-box.featured .intro-stat-num { color: var(--black); font-size: 3.5rem; }
+    .intro-stat-box.featured .intro-stat-label { color: rgba(0,0,0,0.6); }
+    .intro-stat-box.featured .feat-badge {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: rgba(0,0,0,0.15);
+      padding: 6px 14px;
+      border-radius: 2px;
+    }
+
+    /* ══════════════════ PAGES GRID ══════════════════ */
+    .pages-section {
+      padding: 96px 6vw;
+      background: var(--black);
+    }
+    .pages-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 56px;
+    }
+    .pages-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: auto auto;
+      gap: 16px;
+    }
+    .page-card {
+      border: 1px solid var(--border-dark);
+      border-radius: 2px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.4s;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      group: true;
+    }
+    .page-card:hover {
+      border-color: rgba(201,168,76,0.4);
+      transform: translateY(-6px);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    }
+    .page-card:nth-child(1) { grid-column: 1 / 6; }
+    .page-card:nth-child(2) { grid-column: 6 / 10; }
+    .page-card:nth-child(3) { grid-column: 10 / 13; }
+    .page-card:nth-child(4) { grid-column: 1 / 7; }
+    .page-card:nth-child(5) { grid-column: 7 / 13; }
+    .page-card-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease;
+      filter: brightness(0.7) saturate(0.8);
+    }
+    .page-card:hover .page-card-img {
+      transform: scale(1.06);
+      filter: brightness(0.6) saturate(0.7);
+    }
+    .page-card-img-wrap {
+      overflow: hidden;
+      position: relative;
+    }
+    .page-card-num {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      background: rgba(0,0,0,0.7);
+      padding: 4px 10px;
+      border-radius: 2px;
+    }
+    .page-card-body {
+      padding: 24px;
+      background: var(--black-2);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: background 0.3s;
+    }
+    .page-card:hover .page-card-body { background: var(--black-3); }
+    .page-card-tag {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .page-card-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.2;
+    }
+    .page-card-desc {
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.6;
+      font-weight: 300;
+      margin-top: 4px;
+      flex: 1;
+    }
+    .page-card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--gold);
+      margin-top: 10px;
+      letter-spacing: 0.04em;
+      transition: gap 0.2s;
+    }
+    .page-card:hover .page-card-link { gap: 10px; }
+
+    /* ══════════════════ HOW IT WORKS ══════════════════ */
+    .how {
+      padding: 96px 6vw;
+      background: var(--off-white);
+    }
+    .how .section-tag { color: var(--gold-dark); }
+    .how .section-title { color: var(--black); }
+    .how-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      margin-top: 56px;
+    }
+    .steps { display: flex; flex-direction: column; gap: 0; }
+    .step {
+      display: flex;
+      gap: 24px;
+      padding: 28px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      transition: all 0.2s;
+    }
+    .step:last-child { border-bottom: none; }
+    .step:hover .step-num {
+      background: var(--gold);
+      color: var(--black);
+      border-color: var(--gold);
+    }
+    .step-num {
+      width: 48px; height: 48px;
+      flex-shrink: 0;
+      border: 1.5px solid var(--gold);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--gold);
+      transition: all 0.3s;
+    }
+    .step-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--black);
+      margin-bottom: 6px;
+    }
+    .step-text {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      color: rgba(0,0,0,0.5);
+      line-height: 1.65;
+      font-weight: 300;
+    }
+    .how-visual {
+      position: relative;
+    }
+    .how-main-img {
+      width: 100%;
+      height: 500px;
+      object-fit: cover;
+      object-position: center top;
+      border-radius: 2px;
+      filter: saturate(0.6) brightness(0.95);
+    }
+    .how-float {
+      position: absolute;
+      bottom: -24px;
+      right: -24px;
+      background: var(--gold);
+      padding: 24px 28px;
+      border-radius: 2px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .how-float-num {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--black);
+      display: block;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .how-float-label {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      color: rgba(0,0,0,0.6);
+    }
+
+    /* ══════════════════ TESTIMONIALS ══════════════════ */
+    .testimonials {
+      padding: 96px 6vw;
+      background: var(--black-2);
+      border-top: 1px solid var(--border-dark);
+      border-bottom: 1px solid var(--border-dark);
+    }
+    .testimonials-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .testimonial-card {
+      border: 1px solid var(--border-dark);
+      border-radius: 2px;
+      padding: 36px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .testimonial-card::before {
+      content: '"';
+      position: absolute;
+      top: -10px;
+      right: 24px;
+      font-family: var(--font-display);
+      font-size: 8rem;
+      color: rgba(201,168,76,0.06);
+      line-height: 1;
+      pointer-events: none;
+    }
+    .testimonial-card:hover {
+      border-color: rgba(201,168,76,0.3);
+      transform: translateY(-4px);
+      background: var(--black-3);
+    }
+    .t-stars {
+      display: flex;
+      gap: 3px;
+      margin-bottom: 20px;
+    }
+    .t-star {
+      width: 14px; height: 14px;
+      color: var(--gold);
+      font-size: 0.75rem;
+    }
+    .t-text {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-style: italic;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.7;
+      margin-bottom: 28px;
+      font-weight: 300;
+    }
+    .t-author {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .t-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      filter: grayscale(30%);
+      border: 2px solid var(--gold-dark);
+    }
+    .t-name {
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--white);
+    }
+    .t-role {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      color: var(--gold);
+      font-weight: 300;
+    }
+
+    /* ══════════════════ CTA BANNER ══════════════════ */
+    .cta-banner {
+      padding: 96px 6vw;
+      background: var(--black);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      width: 800px; height: 600px;
+      background: radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-banner-content {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .cta-banner h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 20px;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+    }
+    .cta-banner h2 em { font-style: italic; color: var(--gold); }
+    .cta-banner p {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      color: rgba(255,255,255,0.55);
+      font-weight: 300;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+    .cta-btns {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ══════════════════ RESPONSIVE ══════════════════ */
+    @media (max-width: 1100px) {
+      .page-card:nth-child(1) { grid-column: 1 / 7; }
+      .page-card:nth-child(2) { grid-column: 7 / 10; }
+      .page-card:nth-child(3) { grid-column: 10 / 13; }
+    }
+    @media (max-width: 900px) {
+      .intro-strip-inner { grid-template-columns: 1fr; gap: 48px; }
+      .how-inner { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .pages-grid { grid-template-columns: 1fr 1fr; }
+      .page-card:nth-child(n) { grid-column: auto; }
+      .hero-stats { display: none; }
+      .intro-features { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .pages-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="logo-icon">◆</span>
+      <span>Uni<strong>Thrive+</strong></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="explore.html">Explore</a></li>
+      <li><a href="finances.html">Finances</a></li>
+      <li><a href="marketplace.html">Marketplace</a></li>
+      <li><a href="community.html">Community</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="finances.html" class="nav-btn">Get Started →</a>
+    </div>
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" class="active">Home</a>
+  <a href="explore.html">Explore</a>
+  <a href="finances.html">Finances</a>
+  <a href="marketplace.html">Marketplace</a>
+  <a href="community.html">Community</a>
+  <a href="finances.html" style="color:var(--gold);margin-top:8px;">Get Started →</a>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-grain"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">For Students, By Students · MUST</div>
+    <h1 class="hero-title">
+      Live Smart.<br>
+      <em>Spend Less.</em>
+      Thrive More.
+    </h1>
+    <p class="hero-sub">
+      CampusBudget+ is your all-in-one platform for affordable student living — find deals, track finances, buy & sell, and connect with a community that gets it.
+    </p>
+    <div class="hero-cta">
+      <a href="explore.html" class="btn-gold">Explore Deals →</a>
+      <a href="finances.html" class="btn-outline-white">Track My Budget</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num">5,000+</div>
+      <div class="hero-stat-label">Active Students</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">2,400+</div>
+      <div class="hero-stat-label">Active Listings</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">UGX 4M+</div>
+      <div class="hero-stat-label">Total Savings Generated</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">98%</div>
+      <div class="hero-stat-label">Student Satisfaction</div>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <span class="scroll-text">Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ═══ TICKER ═══ -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ticker-item">🍔 Cafeteria Meals from UGX 2,500</span>
+    <span class="ticker-item">📚 Textbooks up to 70% Off</span>
+    <span class="ticker-item">🚌 Shared Rides · UGX 500</span>
+    <span class="ticker-item">🏠 Hostel Listings Near Campus</span>
+    <span class="ticker-item">💻 Second-Hand Laptops</span>
+    <span class="ticker-item">📱 Data Bundles Shared Daily</span>
+    <span class="ticker-item">🎓 Free Tutoring Sessions</span>
+    <span class="ticker-item">🏷️ Student-Exclusive Deals</span>
+    <!-- repeat for seamless loop -->
+    <span class="ticker-item">🍔 Cafeteria Meals from UGX 2,500</span>
+    <span class="ticker-item">📚 Textbooks up to 70% Off</span>
+    <span class="ticker-item">🚌 Shared Rides · UGX 500</span>
+    <span class="ticker-item">🏠 Hostel Listings Near Campus</span>
+    <span class="ticker-item">💻 Second-Hand Laptops</span>
+    <span class="ticker-item">📱 Data Bundles Shared Daily</span>
+    <span class="ticker-item">🎓 Free Tutoring Sessions</span>
+    <span class="ticker-item">🏷️ Student-Exclusive Deals</span>
+  </div>
+</div>
+
+<!-- ═══ INTRO STRIP ═══ -->
+<section class="intro-strip">
+  <div class="intro-strip-inner">
+    <div class="intro-text reveal">
+      <span class="section-tag">// About CampusBudget+</span>
+      <h2 class="section-title">More Than a<br><em>Budgeting App</em></h2>
+      <p class="intro-lead">We built CampusBudget+ because student life is expensive — and not just tuition.</p>
+      <div class="intro-features">
+        <div class="intro-feat">
+          <div class="intro-feat-icon">🗺️</div>
+          <div>
+            <div class="intro-feat-title">Discover Local Deals</div>
+            <div class="intro-feat-text">Verified affordable spots near campus for food, rides & more.</div>
+          </div>
+        </div>
+        <div class="intro-feat">
+          <div class="intro-feat-icon">💳</div>
+          <div>
+            <div class="intro-feat-title">Track Every Shilling</div>
+            <div class="intro-feat-text">Smart budgeting dashboard with visual spending insights.</div>
+          </div>
+        </div>
+        <div class="intro-feat">
+          <div class="intro-feat-icon">🛒</div>
+          <div>
+            <div class="intro-feat-title">Student Marketplace</div>
+            <div class="intro-feat-text">Buy & sell textbooks, electronics, clothing peer-to-peer.</div>
+          </div>
+        </div>
+        <div class="intro-feat">
+          <div class="intro-feat-icon">🤝</div>
+          <div>
+            <div class="intro-feat-title">Community Hub</div>
+            <div class="intro-feat-text">Share resources, ride requests, and study materials.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="intro-stats-col reveal reveal-delay-2">
+      <div class="intro-stat-box">
+        <div class="intro-stat-num">48+</div>
+        <div class="intro-stat-label">Food Listings</div>
+      </div>
+      <div class="intro-stat-box">
+        <div class="intro-stat-num">23+</div>
+        <div class="intro-stat-label">Housing Options</div>
+      </div>
+      <div class="intro-stat-box">
+        <div class="intro-stat-num">67+</div>
+        <div class="intro-stat-label">Study Resources</div>
+      </div>
+      <div class="intro-stat-box">
+        <div class="intro-stat-num">31+</div>
+        <div class="intro-stat-label">Transport Routes</div>
+      </div>
+      <div class="intro-stat-box featured">
+        <div>
+          <div class="intro-stat-num">UGX 320K</div>
+          <div class="intro-stat-label">Average monthly student savings</div>
+        </div>
+        <span class="feat-badge">↑ 12% this month</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PAGES GRID ═══ -->
+<section class="pages-section">
+  <div class="pages-header reveal">
+    <div>
+      <span class="section-tag">// Five Key Spaces</span>
+      <h2 class="section-title" style="margin-bottom:0;">Everything in<br><em>One Place</em></h2>
+    </div>
+    <a href="explore.html" class="btn-outline-gold">Browse All →</a>
+  </div>
+  <div class="pages-grid">
+    <a href="explore.html" class="page-card reveal">
+      <div class="page-card-img-wrap">
+        <img class="page-card-img" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80&fit=crop" alt="Food deals" loading="lazy" />
+        <span class="page-card-num">01</span>
+      </div>
+      <div class="page-card-body">
+        <span class="page-card-tag">Explore & Discover</span>
+        <div class="page-card-title">Find Affordable Everything</div>
+        <p class="page-card-desc">Browse verified listings for food, housing, transport & essentials — all near your campus and curated by fellow students.</p>
+        <span class="page-card-link">Browse listings →</span>
+      </div>
+    </a>
+    <a href="finances.html" class="page-card reveal reveal-delay-1">
+      <div class="page-card-img-wrap">
+        <img class="page-card-img" src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&q=80&fit=crop" alt="Finances" loading="lazy" />
+        <span class="page-card-num">02</span>
+      </div>
+      <div class="page-card-body">
+        <span class="page-card-tag">Finances & Budget</span>
+        <div class="page-card-title">Track Every Shilling</div>
+        <p class="page-card-desc">Smart income and expense tracking with visual insights and savings goals.</p>
+        <span class="page-card-link">Open dashboard →</span>
+      </div>
+    </a>
+    <a href="marketplace.html" class="page-card reveal reveal-delay-2">
+      <div class="page-card-img-wrap">
+        <img class="page-card-img" src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=600&q=80&fit=crop" alt="Marketplace" loading="lazy" />
+        <span class="page-card-num">03</span>
+      </div>
+      <div class="page-card-body">
+        <span class="page-card-tag">Marketplace</span>
+        <div class="page-card-title">Buy & Sell</div>
+        <p class="page-card-desc">Pre-owned textbooks, electronics & clothing — peer to peer.</p>
+        <span class="page-card-link">Visit market →</span>
+      </div>
+    </a>
+    <a href="community.html" class="page-card reveal">
+      <div class="page-card-img-wrap">
+        <img class="page-card-img" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80&fit=crop" alt="Community" loading="lazy" />
+        <span class="page-card-num">04</span>
+      </div>
+      <div class="page-card-body">
+        <span class="page-card-tag">Community Hub</span>
+        <div class="page-card-title">Share & Connect</div>
+        <p class="page-card-desc">Post ride-sharing requests, share study materials, discuss campus life, and support each other's financial journeys together.</p>
+        <span class="page-card-link">Join community →</span>
+      </div>
+    </a>
+    <a href="explore.html#resources" class="page-card reveal reveal-delay-1">
+      <div class="page-card-img-wrap">
+        <img class="page-card-img" src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80&fit=crop" alt="Resources" loading="lazy" />
+        <span class="page-card-num">05</span>
+      </div>
+      <div class="page-card-body">
+        <span class="page-card-tag">Resource Sharing</span>
+        <div class="page-card-title">Study Smarter</div>
+        <p class="page-card-desc">Download lecture notes, past papers, lab manuals and textbooks shared freely by students across all years and faculties.</p>
+        <span class="page-card-link">Get resources →</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section class="how">
+  <div class="reveal" style="text-align:center;margin-bottom:0;">
+    <span class="section-tag" style="color:var(--gold-dark);">// How It Works</span>
+    <h2 class="section-title dark" style="text-align:center;">Up & Running<br>in <em>Minutes</em></h2>
+  </div>
+  <div class="how-inner">
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div>
+          <div class="step-title">Create Your Student Profile</div>
+          <p class="step-text">Sign up with your university email. Your profile is private, verified, and trusted by the campus community.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div>
+          <div class="step-title">Set Your Monthly Budget</div>
+          <p class="step-text">Enter income sources — bursary, allowance, part-time work. Let our smart budget tool do the rest.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div>
+          <div class="step-title">Explore Deals Near You</div>
+          <p class="step-text">Browse location-based listings for food, rides, accommodation and essentials around your campus.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div>
+          <div class="step-title">Save, Share & Thrive</div>
+          <p class="step-text">Post items for sale, share resources, join community forums — and watch your monthly savings grow.</p>
+        </div>
+      </div>
+    </div>
+    <div class="how-visual reveal reveal-delay-2">
+      <img class="how-main-img" src="https://images.unsplash.com/photo-1541516160071-4bb0c5af65ba?w=900&q=85&fit=crop&crop=top" alt="Students studying" loading="lazy" />
+      <div class="how-float">
+        <span class="how-float-num">UGX 320K</span>
+        <span class="how-float-label">Average monthly savings per student</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TESTIMONIALS ═══ -->
+<section class="testimonials">
+  <div class="testimonials-header reveal">
+    <span class="section-tag">// Student Stories</span>
+    <h2 class="section-title">What Students<br><em>Are Saying</em></h2>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card reveal">
+      <div class="t-stars">★★★★★</div>
+      <p class="t-text">"I found a hostel 200m from campus at half the price of where I was staying. CampusBudget+ literally saved me UGX 180,000 a month."</p>
+      <div class="t-author">
+        <img class="t-avatar" src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=100&q=80&fit=crop&crop=face" alt="Amara" />
+        <div>
+          <div class="t-name">Amara</div>
+          <div class="t-role">Year 2, Business Administration</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-1">
+      <div class="t-stars">★★★★★</div>
+      <p class="t-text">"The budget tracker is so simple to use. I finally know where every shilling goes. I even managed to save for my laptop repair in 3 weeks."</p>
+      <div class="t-author">
+        <img class="t-avatar" src="https://images.unsplash.com/photo-1499887142886-791eca5918cd?w=100&q=80&fit=crop&crop=face" alt="Tendo" />
+        <div>
+          <div class="t-name">Teddy</div>
+          <div class="t-role">Year 1, Computer Science</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-2">
+      <div class="t-stars">★★★★☆</div>
+      <p class="t-text">"Sold my old textbooks within 2 days of posting. Bought cheaper ones for this semester too. The marketplace is genuinely a game-changer."</p>
+      <div class="t-author">
+        <img class="t-avatar" src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=100&q=80&fit=crop&crop=face" alt="Brenda" />
+        <div>
+          <div class="t-name">Brenda</div>
+          <div class="t-role">Year 3, Law</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA BANNER ═══ -->
+<section class="cta-banner">
+  <div class="cta-banner-content reveal">
+    <h2>Ready to Start <em>Saving?</em></h2>
+    <p>Join thousands of students already living smarter, spending less, and thriving more on CampusBudget+.</p>
+    <div class="cta-btns">
+      <a href="finances.html" class="btn-gold">Create Free Account →</a>
+      <a href="explore.html" class="btn-outline-white">Explore First</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">◆ Uni<strong>Thrive+</strong></div>
+      <p class="footer-tagline">Smart affordable living for every university student at MUST and beyond.</p>
+      <p class="footer-copy">© 2025 UniThrive+ · Group Two, BIT Year 1 · MUST</p>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <a href="explore.html">Explore Listings</a>
+        <a href="finances.html">Budget Tracker</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="community.html">Community</a>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <a href="explore.html#resources">Study Materials</a>
+        <a href="explore.html#transport">Transport</a>
+        <a href="explore.html#deals">Deals Board</a>
+        <a href="community.html#forum">Forums</a>
+      </div>
+      <div class="footer-col">
+        <h4>About</h4>
+        <a href="#">Project Proposal</a>
+        <a href="#">Team</a>
+        <a href="#">GitHub</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="shared.js"></script>
+<script>
+  // Hero bg ken-burns
+  window.addEventListener('load', () => {
+    const bg = document.getElementById('heroBg');
+    if (bg) {
+      const img = new Image();
+      img.onload = () => bg.classList.add('loaded');
+      img.src = 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=90&fit=crop&crop=top';
+    }
+  });
+</script>
+</body>
+</html>
